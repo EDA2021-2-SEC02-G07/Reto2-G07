@@ -53,7 +53,8 @@ def newCatalog():
                '2DArtworks': None,
                'artists_mediums': None,
                'artists_tags': None, 
-               'artworks_dptments': None
+               'artworks_dptments': None,
+               'mediums_map' : None
                }
     
     catalog['artworks'] =      lt.newList('ARRAY_LIST')
@@ -67,6 +68,7 @@ def newCatalog():
     catalog['artists_mediums'] = {}
     catalog['artists_tags'] = lt.newList('ARRAY_LIST')
     catalog['artworks_dptments'] = {}
+    catalog['mediums_map'] = mp.newmap(100, maptype = 'Probing', loadfactor = '0.5', comparefunction = cmpArtworkByMedium)
     
     return catalog
 
@@ -74,6 +76,28 @@ def newCatalog():
 def addArtwork(catalog, artwork):
     # Se adiciona la obra a la lista de obras
     lt.addLast(catalog['artworks'], artwork)
+    year = int(artwork['Date'])
+    medium = artwork['Medium']
+    mediums_map = catalog['mediums_map']
+
+    if mp.contains(mediums_map, medium):
+        yearsmap = mp.get(mediums_map, medium)
+        yearsmap = me.getValue(yearsmap)
+        if mp.contains(yearsmap, year):
+            mp.put(yearsmap, year, artwork)
+            mp.remove(mediums_map, medium)
+            mp.put(mediums_map, medium, yearsmap)
+        else:
+            yearsmap = mp.newMap(100, maptype= 'Probing', loadfactor= '0.5', comparefunction = cmpArtworkByDate)
+            mp.put(yearsmap, year, artwork)
+            mp.remove(mediums_map, medium)
+            mp.put(mediums_map, medium, yearsmap )
+    else: 
+        yearsmap = mp.newMap(100, maptype= 'Probing', loadfactor= '0.5', comparefunction = cmpArtworkByDate)
+        mp.put(yearsmap, year, artwork)
+        mp.put(mediums_map, medium, yearsmap)
+    
+    
 
 def addArtist(catalog, artist):
     # Se adiciona el artista a la lista de artistas
@@ -85,6 +109,10 @@ def add2DArtworks(catalog, artwork):
 def addArtworkdptment(catalog, dptment, dptment_name):
 
     catalog['artworks_dptments'][dptment_name] = dptment
+
+
+
+
 
 
 def addArtistMedium(catalog, artist_medium):
@@ -362,6 +390,25 @@ def cmpArtworkByYear(array1, array2):
     """
     
     return int(array1['Date']) < int(array2['Date'])
+
+def cmpArtworkByMedium(medium, entry):
+
+    mediumentry = me.getKey(entry)
+    if (medium == mediumentry):
+        return 0
+    elif medium > mediumentry:
+        return 1
+    else:
+        return -1
+
+def cmpArtworkByDate(date, entry):
+    dateentry = me.getkey(entry)
+    if date == dateentry:
+        return 0
+    elif date > dateenty:
+        return 1
+    else: 
+        return -1
 
 
 # Funciones de ordenamiento
