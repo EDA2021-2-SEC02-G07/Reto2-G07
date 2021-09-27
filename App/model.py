@@ -68,7 +68,7 @@ def newCatalog():
     catalog['artists_mediums'] = {}
     catalog['artists_tags'] = lt.newList('ARRAY_LIST')
     catalog['artworks_dptments'] = {}
-    catalog['mediums_map'] = mp.newmap(100, maptype = 'Probing', loadfactor = '0.5', comparefunction = cmpArtworkByMedium)
+    catalog['mediums_map'] = mp.newMap(100, maptype = 'Probing', loadfactor = 0.5, comparefunction = cmpArtworkByMedium)
     
     return catalog
 
@@ -76,7 +76,7 @@ def newCatalog():
 def addArtwork(catalog, artwork):
     # Se adiciona la obra a la lista de obras
     lt.addLast(catalog['artworks'], artwork)
-    year = int(artwork['Date'])
+    year = (artwork['Date'])
     medium = artwork['Medium']
     mediums_map = catalog['mediums_map']
 
@@ -88,12 +88,12 @@ def addArtwork(catalog, artwork):
             mp.remove(mediums_map, medium)
             mp.put(mediums_map, medium, yearsmap)
         else:
-            yearsmap = mp.newMap(100, maptype= 'Probing', loadfactor= '0.5', comparefunction = cmpArtworkByDate)
+            yearsmap = mp.newMap(100, maptype= 'Probing', loadfactor= 0.5, comparefunction = cmpArtworkByDate)
             mp.put(yearsmap, year, artwork)
             mp.remove(mediums_map, medium)
             mp.put(mediums_map, medium, yearsmap )
     else: 
-        yearsmap = mp.newMap(100, maptype= 'Probing', loadfactor= '0.5', comparefunction = cmpArtworkByDate)
+        yearsmap = mp.newMap(100, maptype= 'Probing', loadfactor= 0.5, comparefunction = cmpArtworkByDate)
         mp.put(yearsmap, year, artwork)
         mp.put(mediums_map, medium, yearsmap)
     
@@ -402,10 +402,10 @@ def cmpArtworkByMedium(medium, entry):
         return -1
 
 def cmpArtworkByDate(date, entry):
-    dateentry = me.getkey(entry)
+    dateentry = (me.getKey(entry))
     if date == dateentry:
         return 0
-    elif date > dateenty:
+    elif date > dateentry:
         return 1
     else: 
         return -1
