@@ -25,7 +25,8 @@ from DISClib.ADT import list as lt
 import config as cf
 import model
 import csv
-
+from DISClib.ADT import map as mp
+from DISClib.DataStructures import mapentry as me
 
 """
 El controlador se encarga de mediar entre la vista y el modelo.
@@ -57,8 +58,6 @@ def loadData(catalog):
     fillMostUsedMediums(catalog)
     catalog['artists_tags'] = sortArtistTags(catalog, 3)
     sort_dptments(catalog)
-
-    
 
 def loadArtworks(catalog):
     """
@@ -139,15 +138,6 @@ def load2DArtworks(catalog):
     for x in lt.iterator(catalog['artworks']):
         if x['Date'] != '' and x['Width (cm)'] != '' and x['Height (cm)'] != '' :
             model.add2DArtworks(catalog, x)
-    
-# Funciones de ordenamiento
-def sortAdquires(catalog):
-    """
-    Ordena las adquisiciones
-    """
-    return model.sortAdquires(catalog)
-
-# Funciones de consulta 
 
 def loadDptments(catalog):
     artworks = catalog['artworks']
@@ -224,19 +214,8 @@ def fillMostUsedMediums(catalog):
         artist_medium['most_used'] = most_used_medium
         artist_medium_list['Artworks'] = sortArworksByMedium(artist_medium_list, 3)
 
-def sort_dptments(catalog):
-    artworks_dptments = catalog['artworks_dptments']
 
-    for key in artworks_dptments:
-        dptment = artworks_dptments[key]
-        dptment['Artworks'] = sortArtworksByYear(dptment, 3)
-# Funciones de ordenamiento
-
-def sortAdquires(catalog, sort):
-    """
-    Ordena los libros por average_rating
-    """
-    return model.sort(catalog, sort, 'artworks', model.cmpArtworkByDateAcquired)
+# Funciones de consulta sobre el catálogo
 
 def loadRangeOfYears2DArtworks(catalog, begin, end):
     """
@@ -285,28 +264,6 @@ def giveAuthorsName(catalog, ConstituentsID):
         names.append(' '+model.giveAuthorName(catalog, x))
     return ','.join(names)
 
-def sortArtists(catalog, sort):
-    """
-    Ordena los libros por average_rating
-    """
-    return model.sort(catalog, sort, 'artists', model.cmpArtistByBeginDate)
-
-
-def sortArworksByMedium(artistmedium, sort):
-    return model.sort(artistmedium, sort, 'Artworks', model.cmpArtworksByMedium)
-
-
-def sortArtworksByYear(Dptment, sort):
-    return model.sort(Dptment, sort, 'Artworks', model.cmpArtworksByYear)
-
-
-def sortArtistTags(catalog, sort):
-    return model.sort(catalog, sort, 'artists_tags', model.cmpArtistByName) 
-
-
-
-# Funciones de consulta sobre el catálogo
-
 def Artist_in_a_range(year1, year2, catalog):
     posiciones = []
     if year1 <= 0:
@@ -323,10 +280,6 @@ def Artist_in_a_range(year1, year2, catalog):
         posiciones=[pos1, pos1 + 1, pos1 +2, pos2 - 2, pos2 -1, pos2]
 
     return size, posiciones 
-
-
-
-
 
 def Artworks_in_a_medium(name, catalog):
     pos1, pos2= model.TagsFromName(name, catalog)
@@ -360,4 +313,42 @@ def Department_transport(catalog, Department):
         expensives.append(expensive[key])
         expensive_prices.append(key)
     return price, weight, size, Oldest, Oldest_prices, expensives, expensive_prices
+
+def give_artworks_in_a_medium(catalog, medium):
+    mediumList = me.getValue(mp.get(catalog['mediums_map'], medium))
+
+    mediumList = model.sortYearsOfaList(mediumList)
     
+    return mediumList
+# Funciones de ordenamiento
+
+def sortAdquires(catalog):
+    """
+    Ordena las adquisiciones
+    """
+    return model.sortAdquires(catalog)
+
+def sortArtists(catalog, sort):
+    """
+    Ordena los libros por average_rating
+    """
+    return model.sort(catalog, sort, 'artists', model.cmpArtistByBeginDate)
+
+
+def sortArworksByMedium(artistmedium, sort):
+    return model.sort(artistmedium, sort, 'Artworks', model.cmpArtworksByMedium)
+
+
+def sortArtworksByYear(Dptment, sort):
+    return model.sort(Dptment, sort, 'Artworks', model.cmpArtworksByYear)
+
+
+def sortArtistTags(catalog, sort):
+    return model.sort(catalog, sort, 'artists_tags', model.cmpArtistByName) 
+
+def sort_dptments(catalog):
+    artworks_dptments = catalog['artworks_dptments']
+
+    for key in artworks_dptments:
+        dptment = artworks_dptments[key]
+        dptment['Artworks'] = sortArtworksByYear(dptment, 3)

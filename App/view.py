@@ -49,6 +49,7 @@ def printMenu():
     print("5- clasificar las obras por nacionalidad de sus creadores (Req. 4)")
     print("6- transportar obras de un departamento (Req. 5)")
     print("7- proponer una nueva exposición en el museo (Req. 6)")
+    print("8- las n obras más antiguas para un medio específico (Req labMaps)")
     print("0- Salir")
 
 def initCatalog():
@@ -216,6 +217,7 @@ def printBigNation(bigNation, sample =3):
         table.append([ title,artists,medium,artwork['Date'],dimension])
         i-=1
     print(tabulate(table, headers='firstrow', tablefmt='fancy_grid', stralign="left")) 
+
 def printSortNations(nations, sample=10):
 
     size = lt.size(nations)
@@ -229,6 +231,34 @@ def printSortNations(nations, sample=10):
         i+=1
     print(tabulate(table, headers='firstrow', tablefmt='fancy_grid'))    
 
+def printMediumList(medio, MediumList, sample =3):
+    j = lt.size(MediumList)
+    if j < sample:
+        sample = j
+    print('Hay ',j, 'obras hechas en el medio' + medio)
+    print("Las", sample, " más antiguas son:")
+    print()
+    j = lt.size(MediumList)
+    i=1
+    table = [['Title ', 'ArtistNames', 'Medium', 'Date', 'Dimensions']]
+    while i <= sample:
+        artwork = lt.getElement(MediumList,i)
+        if len(str(artwork['Title'])) > 30:
+            title = str(artwork['Title'])[0:30] + '...'
+        else: title = str(artwork['Title'])
+        if len(controller.giveAuthorsName(catalog, eval(artwork['ConstituentID']))) > 14:
+            artists = controller.giveAuthorsName(catalog, eval(artwork['ConstituentID']))[0:30] + '...'
+        else: artists = controller.giveAuthorsName(catalog, eval(artwork['ConstituentID']))
+        if len(artwork['Medium']) > 30:
+            medium = artwork['Medium'][0:30] + '...'
+        else: medium = artwork['Medium']
+        if len(artwork['Dimensions']) > 35:
+            dimension = artwork['Dimensions'][0:35] + '...'
+        else: dimension = artwork['Dimensions']
+        table.append([ title,artists,medium,artwork['Date'],dimension])
+        i+=1
+    
+    print(tabulate(table, headers='firstrow', tablefmt='fancy_grid', stralign="left")) 
 catalog = None
 
 """
@@ -417,7 +447,33 @@ while True:
         printSort2DArtworksByYear(catalog, InitialYear, EndingYear, area)
         elapsed_time_mseg = (stop_time - start_time)*1000
         print('La carga demoró', elapsed_time_mseg, 'milisegundos')
+    
+    elif int(inputs[0]) == 8:
         
+        try:
+            start_time = time.process_time()
+
+            n = int(input('Escriba el número de obras a consultar por medio: '))  
+            medio = input('Escriba el medio que desea consultar: ')
+            print()
+            print('=============== Req labMaps Inputs ===============')
+            print('Buscando', n, 'obras más antiguas para el medio '+ medio)
+            print()
+            print('=============== Req labMaps Answer ===============')
+            mediumList = controller.give_artworks_in_a_medium(catalog, medio)
+            printMediumList(medio, mediumList, n)
+
+            elapsed_time_mseg = (stop_time - start_time)*1000
+            print('La carga demoró', elapsed_time_mseg, 'milisegundos')
+        except TypeError:
+            print()
+            print('ERROR: Ingrese un medio válido')
+            print()
+        except ValueError:
+            print()
+            print('ERROR: Ingrese un número de obras válido')
+            print()
+
     else:
         sys.exit(0)
 sys.exit(0)

@@ -75,27 +75,21 @@ def newCatalog():
 # Funciones para agregar informacion al catalogo
 def addArtwork(catalog, artwork):
     # Se adiciona la obra a la lista de obras
+    # Adicionalmente se adiciona la obra a al mapa de obras por "Medium" agregando esta al "key" que sea igual asu medio.
     lt.addLast(catalog['artworks'], artwork)
-    year = (artwork['Date'])
-    medium = artwork['Medium']
-    mediums_map = catalog['mediums_map']
 
-    if mp.contains(mediums_map, medium):
-        yearsmap = mp.get(mediums_map, medium)
-        yearsmap = me.getValue(yearsmap)
-        if mp.contains(yearsmap, year):
-            mp.put(yearsmap, year, artwork)
-            mp.remove(mediums_map, medium)
-            mp.put(mediums_map, medium, yearsmap)
-        else:
-            yearsmap = mp.newMap(100, maptype= 'Probing', loadfactor= 0.5, comparefunction = cmpArtworkByDate)
-            mp.put(yearsmap, year, artwork)
-            mp.remove(mediums_map, medium)
-            mp.put(mediums_map, medium, yearsmap )
+    medium = artwork['Medium']
+
+
+    if mp.contains(catalog['mediums_map'], medium):
+        mediumListKeyValue = mp.get(catalog['mediums_map'], medium)
+        mediumListValue = me.getValue(mediumListKeyValue)
+        lt.addLast(mediumListValue, artwork)
+        mp.put(catalog['mediums_map'], medium, mediumListValue)
     else: 
-        yearsmap = mp.newMap(100, maptype= 'Probing', loadfactor= 0.5, comparefunction = cmpArtworkByDate)
-        mp.put(yearsmap, year, artwork)
-        mp.put(mediums_map, medium, yearsmap)
+        mediumList = lt.newList('ARRAY_LIST')
+        lt.addLast(mediumList, artwork)
+        mp.put(catalog['mediums_map'], medium, mediumList)
     
     
 
@@ -413,6 +407,12 @@ def cmpArtworkByDate(date, entry):
 
 # Funciones de ordenamiento
 
+def sortYearsOfaList(list):
+    # Organiza una lista de obras según su fecha 'Date'.
+
+    sorted_list = merge.sort(list, cmpArtworksByYear)
+    return  sorted_list
+
 def sortAdquires(catalog):
     # Organiza una lista de obras según su fecha de adquisición.
 
@@ -437,10 +437,6 @@ def sortBigNation(catalog):
     sorted_list = merge.sort(catalog['bigNation'], cmpArtworkBySize)
     return  sorted_list
 
-
-
-
-
 def cmpArtistByBeginDate(artist1, artist2):
     """
     Devuelve verdadero (True) si el 'BeginDate' de artist1 es menores que el de artist2
@@ -454,7 +450,6 @@ def cmpArtistByBeginDate(artist1, artist2):
 
     return x
 
-
 def cmpArtistByBeginDateItem(item, artist):
 
     date1 = int(artist['BeginDate'])
@@ -467,7 +462,6 @@ def cmpArtistByBeginDateItem(item, artist):
     elif date2 < date1:
         return 1
 
-
 def cmpArtistByName(artist1,artist2):
 
     if artist1['name'] == '' or artist2['name'] == '':
@@ -476,9 +470,6 @@ def cmpArtistByName(artist1,artist2):
         x = artist1['name'] < artist2['name']
     
     return x
-
-
-
 
 def cmpArtistByNameItem(item, artist):
     name1 = artist['name']
@@ -491,7 +482,6 @@ def cmpArtistByNameItem(item, artist):
     elif name2 < name1:
         return 1
 
-
 def cmpArtworksByYear(artwork1, artwork2):
     if artwork1['Date'] == '' or artwork2['Date'] == '':
         x = False
@@ -499,8 +489,6 @@ def cmpArtworksByYear(artwork1, artwork2):
         x = artwork1['Date'] < artwork2['Date']
     
     return x
-
-
 
 def cmpArtworksByMedium(artwork1, artwork2):
 
@@ -530,25 +518,14 @@ def sort(catalog, sort, key, cmpfunction):
     sub_list = lt.subList(catalog[key], 1, size)
     sub_list = sub_list.copy()
     if sort == 1:
-        start_time = time.process_time()
-        sorted_list = insertion.sort(sub_list, cmpfunction)
-        stop_time = time.process_time()
-        elapsed_time_mseg = (stop_time - start_time)*1000
-    elif sort == 3:
-        start_time = time.process_time()
-        sorted_list = merge.sort(sub_list, cmpfunction)
-        stop_time = time.process_time()
-        elapsed_time_mseg = (stop_time - start_time)*1000
+        sorted_list = insertion.sort(sub_list, cmpfunction) 
+    elif sort == 3:     
+        sorted_list = merge.sort(sub_list, cmpfunction)      
     elif sort == 4:
-        start_time = time.process_time()
-        sorted_list = quick.sort(sub_list, cmpfunction)
-        stop_time = time.process_time()
-        elapsed_time_mseg = (stop_time - start_time)*1000
-    else:
-        start_time = time.process_time()
+        sorted_list = quick.sort(sub_list, cmpfunction)  
+    else: 
         sorted_list = shell.sort(sub_list, cmpfunction)
-        stop_time = time.process_time()
-        elapsed_time_mseg = (stop_time - start_time)*1000    
+    
     return sorted_list
 
 
