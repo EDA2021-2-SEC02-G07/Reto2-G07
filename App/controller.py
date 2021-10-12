@@ -184,14 +184,16 @@ def fillArtistMediums(catalog):
         IDs = model.getElement(Artworks, 'ConstituentID', i)
         IDs = IDs.replace('[','').replace(']','').split(',')
         medium = model.getElement(Artworks, 'Medium', i)
-
         for ID1 in IDs:
             ID = str(ID1)
             try:
-                artlist = artists_mediums [ID] ['Artworks']
-                mediums = artists_mediums[ID]['mediums']
+                artist_medium = me.getValue(mp.get(artists_mediums, ID))
+                artlist = artist_medium ['Artworks']
+                mediums = artist_medium ['mediums']
             except: 
-                continue 
+                continue
+            
+            
 
             model.fillArtworks(artlist, artwork)
             
@@ -205,10 +207,12 @@ def fillArtistMediums(catalog):
     
 def fillMostUsedMediums(catalog):
     artists_mediums=catalog['artists_mediums']
-
-    for key in artists_mediums:
-        artist_medium = artists_mediums[key]['mediums']
-        artist_medium_list = artists_mediums[key]
+    keys = mp.keySet(artists_mediums)
+    size = lt.size(keys)
+    for i in range(0, size + 1):
+        key = model.lt.getElement(keys, i)
+        artist_medium = me.getValue(mp.get(artists_mediums, key))['mediums']
+        artist_medium_list = me.getValue(mp.get(artists_mediums, key))
         mediums_list = artist_medium['mediums_list']
         most_used_medium = model.MostUsedMedium(mediums_list)
         artist_medium['most_used'] = most_used_medium
@@ -283,8 +287,8 @@ def Artist_in_a_range(year1, year2, catalog):
 
 def Artworks_in_a_medium(name, catalog):
     pos1, pos2= model.TagsFromName(name, catalog)
-    ID = model.getElement(catalog['artists_tags'], 'ID', pos2)
-    Artist_medium = catalog['artists_mediums'][ID]
+    ID = model.getElement(catalog['artists_tags'], 'ID', pos1)
+    Artist_medium = me.getValue(mp.get(catalog['artist_mediums']), ID)
     medium = Artist_medium['mediums']['most_used']
     total = Artist_medium['mediums']['total']
     pos1, pos2 = model.Artworks_in_a_medium(medium, Artist_medium)
