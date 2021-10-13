@@ -28,8 +28,9 @@ assert cf
 from tabulate import tabulate
 import sys
 import time
-from tabulate import tabulate
 from datetime import datetime
+from DISClib.ADT import map as mp
+from DISClib.DataStructures import mapentry as me
 default_limit = 1000
 sys.setrecursionlimit(default_limit*10)
 
@@ -50,6 +51,7 @@ def printMenu():
     print("6- transportar obras de un departamento (Req. 5)")
     print("7- proponer una nueva exposición en el museo (Req. 6)")
     print("8- las n obras más antiguas para un medio específico (Req labMaps)")
+    print("9- número de obras con una nacionalidad (Req lab 6)")
     print("0- Salir")
 
 def initCatalog():
@@ -372,7 +374,10 @@ while True:
         printBigNation(catalog['bigNation'])
         elapsed_time_mseg = (stop_time - start_time)*1000
         print('La carga demoró', elapsed_time_mseg, 'milisegundos')
-
+        n = 0
+        for x in catalog['nations']['elements']:
+            n += 1
+        print(n)
     elif int(inputs[0]) == 6: 
         start_time = time.process_time()
         Department = input('Ingrese el nombre del departamento: ')
@@ -473,6 +478,26 @@ while True:
             print()
             print('ERROR: Ingrese un número de obras válido')
             print()
+
+    elif int(inputs[0]) == 9:
+        
+        try:
+            start_time = time.process_time()
+            nacionalidad = input('Escriba la nacionaidad que desea consultar: ')
+            print()
+            print('=============== Req labMaps 6 Inputs ===============')
+            print('Buscando el número de obras de nacionalidad '+ nacionalidad)
+            print()
+            print('=============== Req labMaps Answer ===============')
+            print('El número total de obras de la nacionalidad '+ nacionalidad + ' es', mp.size(me.getValue(mp.get(catalog['nationSize'], nacionalidad))))
+
+            elapsed_time_mseg = (stop_time - start_time)*1000
+            print('La carga demoró', elapsed_time_mseg, 'milisegundos')
+        except TypeError:
+            print()
+            print('ERROR: Ingrese una nacionalidad válida.')
+            print()
+
 
     else:
         sys.exit(0)
