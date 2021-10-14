@@ -68,7 +68,12 @@ def newCatalog():
     catalog['artists_mediums'] = mp.newMap(1000, maptype = 'Probing', loadfactor = 0.5, comparefunction = cmpValueWithEntry)
     catalog['artists_tags'] = lt.newList('ARRAY_LIST')
     catalog['artworks_dptments'] = {}
+<<<<<<< HEAD
     catalog['mediums_map'] = mp.newMap(100, maptype = 'Probing', loadfactor = 0.5, comparefunction = cmpValueWithEntry)
+=======
+    catalog['nationSize'] = mp.newMap(120, maptype = 'Probing', loadfactor = 0.5)
+    catalog['nationalities'] = mp.newMap(120, maptype = 'Probing', loadfactor = 0.5)
+>>>>>>> Pruebas_maps_est_2
     
     return catalog
 
@@ -95,6 +100,22 @@ def addArtwork(catalog, artwork):
 
 def addArtist(catalog, artist):
     # Se adiciona el artista a la lista de artistas
+
+    nts = catalog['nationalities']
+    Unknown = lt.newList(datastructure='ARRAY_LIST', cmpfunction= None, key='ConstituentID')
+    Unknown['nation'] = 'Unknown'
+    mp.put(nts,'Unknown', Unknown)
+    sizes = catalog['nationSize']
+    mp.put(sizes,'Unknown', Unknown)
+    if str(artist['Nationality']) != '':
+        if mp.get(nts,str(artist['Nationality'])) == None:
+            nation = lt.newList(datastructure='ARRAY_LIST', cmpfunction= None, key='ConstituentID')
+            nation1 = lt.newList(datastructure='ARRAY_LIST', cmpfunction= None, key='ConstituentID')
+            nation['nation'] =  str(artist['Nationality'])
+            nation1['nation'] =  str(artist['Nationality'])
+            mp.put(nts,str(artist['Nationality']),nation1)
+            mp.put(sizes,str(artist['Nationality']),nation)
+    
     lt.addLast(catalog['artists'], artist)
 
 def add2DArtworks(catalog, artwork):

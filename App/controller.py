@@ -68,7 +68,7 @@ def loadArtworks(catalog):
     """
     Carga las obras del archivo.  
     """
-    artfile = cf.data_dir + 'Artworks-utf8-small.csv'
+    artfile = cf.data_dir + 'Artworks-utf8-large.csv'
     input_file = csv.DictReader(open(artfile, encoding='utf-8'))
     for artwork in input_file:
         model.addArtwork(catalog, artwork)
@@ -79,7 +79,7 @@ def loadArtists(catalog):
 
     Complejidad:  O(n + nlogn) n es el número de obras.
     """
-    artfile = cf.data_dir + 'Artists-utf8-small.csv'
+    artfile = cf.data_dir + 'Artists-utf8-large.csv'
     input_file = csv.DictReader(open(artfile, encoding='utf-8'))
     for artist in input_file:
         model.addArtist(catalog, artist) 
@@ -102,38 +102,33 @@ def loadNacionalities(catalog):
 
         Complejidad:  tilda(2m+nlogm) n es el número de obras y m el número de artistas, en archivo large m igual al 11% de n
     """
-    catalog['nationSize'] = {}
-    catalog['nationalities'] = {}
-    catalog['nationalities']['Unknown'] = lt.newList(datastructure='ARRAY_LIST', cmpfunction= None, key='ConstituentID')
-    catalog['nationalities']['Unknown']['nation'] = 'Unknown'
-    catalog['nationSize']['Unknown'] =lt.newList(datastructure='ARRAY_LIST', cmpfunction= None, key='ConstituentID')
-    catalog['nationSize']['Unknown']['nation'] = 'Unknown'
-    for x in lt.iterator(catalog['artists']):
-        if str(x['Nationality']) != '':
-            if catalog['nationalities'].get(str(x['Nationality'])) == None:
-                catalog['nationSize'][str(x['Nationality'])] = lt.newList(datastructure='ARRAY_LIST', cmpfunction= None, key='ConstituentID')
-                catalog['nationSize'][str(x['Nationality'])]['nation'] = str(x['Nationality'])
-                catalog['nationalities'][str(x['Nationality'])] = lt.newList(datastructure='ARRAY_LIST', cmpfunction= None, key='ConstituentID')
-                catalog['nationalities'][str(x['Nationality'])]['nation'] = str(x['Nationality'])
+    artists = catalog['artists']
+    sizes = catalog['nationSize']
+    nts = catalog['nationalities']
+
     for y in lt.iterator(catalog['artworks']):
         for z in eval(y['ConstituentID']):
-            pos = model.giveElementBinarySearch(catalog['artists']['elements'],'ConstituentID',int(z))
+            pos = model.giveElementBinarySearch(artists['elements'],'ConstituentID',int(z))
             if pos != -1:
-                nationality = str(catalog['artists']['elements'][pos]['Nationality'])
+                nationality = lt.getElement(artists, pos + 1)['Nationality']
                 if nationality != '' and nationality != 'Nationality unknown':
-                    lt.addLast(catalog['nationSize'][nationality], y) 
-                    if lt.isPresent(catalog['nationalities'][nationality], y) == 0:
-                        lt.addLast(catalog['nationalities'][nationality], y) 
+                    lt.addLast(me.getValue(mp.get(sizes, nationality)), y) 
+                    if lt.isPresent(me.getValue(mp.get(nts, nationality)), y) == 0: 
+                        lt.addLast(me.getValue(mp.get(nts, nationality)), y) 
                 else: 
-                    lt.addLast(catalog['nationSize']['Unknown'], y)
-                    if lt.isPresent(catalog['nationalities']['Unknown'], y) == 0:
-                        lt.addLast(catalog['nationalities']['Unknown'], y)
-    for x in catalog['nationalities']:
-        lt.addLast(catalog['bigNation'],catalog['nationalities'][x])
+                    lt.addLast(me.getValue(mp.get(sizes, 'Unknown')), y) 
+                    if lt.isPresent(me.getValue(mp.get(nts, 'Unknown')), y) == 0: 
+                        lt.addLast(me.getValue(mp.get(nts, 'Unknown')), y) 
+
+    for x in lt.iterator(mp.keySet(nts)):
+        z = mp.get(nts, x)['value']
+        lt.addLast(catalog['bigNation'],z)
     catalog['bigNation'] = model.sortBigNation(catalog)
     catalog['bigNation'] = catalog['bigNation']['elements'][0]
-    for x in catalog['nationSize']:
-        lt.addLast(catalog['nations'],catalog['nationSize'][x])
+
+    for x in lt.iterator(mp.keySet(sizes)):
+        z = mp.get(sizes, x)['value']
+        lt.addLast(catalog['nations'],z)
     catalog['nations'] = model.sortNationsSize(catalog)
     
 def load2DArtworks(catalog):
