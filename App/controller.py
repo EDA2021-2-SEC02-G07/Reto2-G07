@@ -24,6 +24,7 @@
 from DISClib.ADT import list as lt
 import config as cf
 import model
+import time
 import csv
 from DISClib.ADT import map as mp
 from DISClib.DataStructures import mapentry as me
@@ -51,11 +52,15 @@ def loadData(catalog):
     loadAdquires(catalog)
     loadNacionalities(catalog)
     load2DArtworks(catalog)
+    start_time = time.process_time()
     loadArtistMediumsTags(catalog)
-    loadDptments(catalog)
-    catalog['artists'] = sortArtists(catalog, 3)
     fillArtistMediums(catalog)
     fillMostUsedMediums(catalog)
+    stop_time = time.process_time()
+    elapsed_time_mseg = (stop_time - start_time)
+    print('La carga del índice por medio demoró', elapsed_time_mseg, 'segundos')
+    loadDptments(catalog)
+    catalog['artists'] = sortArtists(catalog, 3)
     catalog['artists_tags'] = sortArtistTags(catalog, 3)
     sort_dptments(catalog)
 
