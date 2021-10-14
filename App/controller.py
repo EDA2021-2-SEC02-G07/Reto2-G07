@@ -288,7 +288,7 @@ def Artist_in_a_range(year1, year2, catalog):
 def Artworks_in_a_medium(name, catalog):
     pos1, pos2= model.TagsFromName(name, catalog)
     ID = model.getElement(catalog['artists_tags'], 'ID', pos1)
-    Artist_medium = me.getValue(mp.get(catalog['artist_mediums']), ID)
+    Artist_medium = me.getValue(mp.get(catalog['artists_mediums'], ID))
     medium = Artist_medium['mediums']['most_used']
     total = Artist_medium['mediums']['total']
     pos1, pos2 = model.Artworks_in_a_medium(medium, Artist_medium)

@@ -147,11 +147,10 @@ def newArtistMedium(ID, name):
                     'mediums': {'most_used': "", 
                     'total': 0, 'mediums_list':{}}, 
                     'Artworks': None}
-
-    artisttag = {'ID':0 ,'name': ""}
     artistmedium['ID'] = ID
     artistmedium['name'] = name
     artistmedium['Artworks'] = lt.newList('ARRAY_LIST')
+    artisttag = {'ID':0 ,'name': ""}
     artisttag['ID'] = ID
     artisttag['name'] = name
 

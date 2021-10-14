@@ -348,7 +348,8 @@ while True:
         print('Las obras en las que se utilizó', medium, 'son: ')
         table = [['Título', 'Fecha', 'Medio', 'Dimensiones']]
         while pos1 <= pos2:
-            obra = lt.getElement(catalog['artists_mediums'][ID]['Artworks'], pos1)
+            
+            obra = lt.getElement(controller.me.getValue(controller.mp.get(catalog['artists_mediums'], ID))['Artworks'], pos1)
             Titulo = obra['Title']
             Fecha = obra['Date']
             Medio = obra['Medium']
