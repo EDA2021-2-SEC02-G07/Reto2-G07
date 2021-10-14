@@ -65,10 +65,10 @@ def newCatalog():
     catalog['2DArtworks'] =    lt.newList('ARRAY_LIST')
     catalog['artworks'] = lt.newList('ARRAY_LIST')
     catalog['artists'] = lt.newList('ARRAY_LIST')
-    catalog['artists_mediums'] = {}
+    catalog['artists_mediums'] = mp.newMap(1000, maptype = 'Probing', loadfactor = 0.5, comparefunction = cmpValueWithEntry)
     catalog['artists_tags'] = lt.newList('ARRAY_LIST')
     catalog['artworks_dptments'] = {}
-    catalog['mediums_map'] = mp.newMap(100, maptype = 'Probing', loadfactor = 0.5, comparefunction = cmpArtworkByMedium)
+    catalog['mediums_map'] = mp.newMap(100, maptype = 'Probing', loadfactor = 0.5, comparefunction = cmpValueWithEntry)
     
     return catalog
 
@@ -111,7 +111,7 @@ def addArtworkdptment(catalog, dptment, dptment_name):
 
 def addArtistMedium(catalog, artist_medium):
 
-    catalog['artists_mediums'][artist_medium['ID']] = artist_medium
+    mp.put(catalog['artists_mediums'], artist_medium['ID'], artist_medium)
 
 
 def addArtistTag(catalog, artist_tag):
@@ -147,11 +147,10 @@ def newArtistMedium(ID, name):
                     'mediums': {'most_used': "", 
                     'total': 0, 'mediums_list':{}}, 
                     'Artworks': None}
-
-    artisttag = {'ID':0 ,'name': ""}
     artistmedium['ID'] = ID
     artistmedium['name'] = name
     artistmedium['Artworks'] = lt.newList('ARRAY_LIST')
+    artisttag = {'ID':0 ,'name': ""}
     artisttag['ID'] = ID
     artisttag['name'] = name
 
@@ -394,6 +393,16 @@ def cmpArtworkByMedium(medium, entry):
         return 1
     else:
         return -1
+
+def cmpValueWithEntry(value, entry):
+    keyentry = me.getKey(entry)
+    if value == keyentry:
+        return 0
+    elif value > keyentry:
+        return 1
+    else:
+        return -1
+
 
 def cmpArtworkByDate(date, entry):
     dateentry = (me.getKey(entry))
