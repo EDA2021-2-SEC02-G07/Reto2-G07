@@ -43,16 +43,16 @@ operación solicitada
 
 def printMenu():
     print("Bienvenido")
-    print("1- Cargar información en el catálogo")
-    print("2- listar cronológicamente loas artistas (Req. 1)")
-    print("3- listar cronológicamente las adquisiciones (Req. 2)")
-    print("4- clasificar las obras de un artista por técnica (Req. 3)")
-    print("5- clasificar las obras por nacionalidad de sus creadores (Req. 4)")
-    print("6- transportar obras de un departamento (Req. 5)")
-    print("7- proponer una nueva exposición en el museo (Req. 6)")
-    print("8- las n obras más antiguas para un medio específico (Req labMaps)")
-    print("9- número de obras con una nacionalidad (Req lab 6)")
-    print("0- Salir")
+    print("0- Cargar información en el catálogo")
+    print("1- listar cronológicamente loas artistas (Req. 1)")
+    print("2- listar cronológicamente las adquisiciones (Req. 2)")
+    print("3- clasificar las obras de un artista por técnica (Req. 3)")
+    print("4- clasificar las obras por nacionalidad de sus creadores (Req. 4)")
+    print("5- transportar obras de un departamento (Req. 5)")
+    print("6- proponer una nueva exposición en el museo (Req. 6)")
+    print("7- las n obras más antiguas para un medio específico (Req labMaps)")
+    print("8- número de obras con una nacionalidad (Req lab 6)")
+    print("9- Salir")
 
 def initCatalog():
     """
@@ -271,7 +271,7 @@ while True:
    
     inputs = input('Seleccione una opción para continuar\n')
     
-    if int(inputs[0]) == 1:
+    if int(inputs[0]) == 0:
         start_time = time.process_time()
         catalog = initCatalog()
         loadData(catalog)
@@ -283,7 +283,7 @@ while True:
         stop_time = time.process_time()
         elapsed_time_mseg = (stop_time - start_time)
         print('La carga demoró', elapsed_time_mseg, 'segundos')
-    elif int(inputs[0]) == 2:
+    elif int(inputs[0]) == 1:
         start_time = time.process_time()
         try:
             year1=int(input('Ingrese el año inicial: '))
@@ -312,7 +312,7 @@ while True:
         elapsed_time_mseg = (stop_time - start_time)*1000
         print('La carga demoró', elapsed_time_mseg, 'milisegundos')
 
-    elif int(inputs[0]) == 3:
+    elif int(inputs[0]) == 2:
         start_time = time.process_time()
         try:
             InitialYear = int(input('Escriba el año inicial de las obras (AAAA): '))
@@ -336,7 +336,7 @@ while True:
         print('La carga demoró', elapsed_time_mseg, 'milisegundos')
         stop_time = time.process_time()
 
-    elif int(inputs[0]) == 4:
+    elif int(inputs[0]) == 3:
         start_time = time.process_time()
         name = input('Ingrese el nombre del artista: ')
 
@@ -363,7 +363,7 @@ while True:
         elapsed_time_mseg = (stop_time - start_time)*1000
         print('La carga demoró', elapsed_time_mseg, 'milisegundos')
 
-    elif int(inputs[0]) == 5:
+    elif int(inputs[0]) == 4:
         start_time = time.process_time()
         print('=============== Req No.4 Inputs ===============')
         print('Clasificando las obras por la nacionalidad de sus creadores... ')
@@ -379,7 +379,7 @@ while True:
         for x in catalog['nations']['elements']:
             n += 1
         print(n)
-    elif int(inputs[0]) == 6: 
+    elif int(inputs[0]) == 5: 
         start_time = time.process_time()
         Department = input('Ingrese el nombre del departamento: ')
 
@@ -439,7 +439,7 @@ while True:
         elapsed_time_mseg = (stop_time - start_time)*1000
         print('La carga demoró', elapsed_time_mseg, 'milisegundos')
 
-    elif int(inputs[0]) == 7:
+    elif int(inputs[0]) == 6:
         start_time = time.process_time()
         InitialYear = int(input('Escriba el año inicial de las obras: '))
         EndingYear = int(input('Escriba el año final de las obras: '))
@@ -454,7 +454,7 @@ while True:
         elapsed_time_mseg = (stop_time - start_time)*1000
         print('La carga demoró', elapsed_time_mseg, 'milisegundos')
     
-    elif int(inputs[0]) == 8:
+    elif int(inputs[0]) == 7:
         
         try:
             start_time = time.process_time()
@@ -480,7 +480,7 @@ while True:
             print('ERROR: Ingrese un número de obras válido')
             print()
 
-    elif int(inputs[0]) == 9:
+    elif int(inputs[0]) == 8:
         
         try:
             start_time = time.process_time()

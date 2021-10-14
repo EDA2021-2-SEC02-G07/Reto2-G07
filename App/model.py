@@ -68,12 +68,12 @@ def newCatalog():
     catalog['artists_mediums'] = mp.newMap(1000, maptype = 'Probing', loadfactor = 0.5, comparefunction = cmpValueWithEntry)
     catalog['artists_tags'] = lt.newList('ARRAY_LIST')
     catalog['artworks_dptments'] = {}
-<<<<<<< HEAD
+    
     catalog['mediums_map'] = mp.newMap(100, maptype = 'Probing', loadfactor = 0.5, comparefunction = cmpValueWithEntry)
-=======
+
     catalog['nationSize'] = mp.newMap(120, maptype = 'Probing', loadfactor = 0.5)
     catalog['nationalities'] = mp.newMap(120, maptype = 'Probing', loadfactor = 0.5)
->>>>>>> Pruebas_maps_est_2
+
     
     return catalog
 
