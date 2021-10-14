@@ -68,7 +68,6 @@ def newCatalog():
     catalog['artists_mediums'] = {}
     catalog['artists_tags'] = lt.newList('ARRAY_LIST')
     catalog['artworks_dptments'] = {}
-    catalog['mediums_map'] = mp.newMap(100, maptype = 'Probing', loadfactor = 0.5, comparefunction = cmpArtworkByMedium)
     catalog['nationSize'] = mp.newMap(120, maptype = 'Probing', loadfactor = 0.5)
     catalog['nationalities'] = mp.newMap(120, maptype = 'Probing', loadfactor = 0.5)
     
