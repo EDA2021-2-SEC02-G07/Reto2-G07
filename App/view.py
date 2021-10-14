@@ -356,6 +356,17 @@ while True:
             Fecha = obra['Date']
             Medio = obra['Medium']
             Dimensiones = obra['Dimensions']
+
+            if len(Titulo) > 30:
+                Titulo = str(Titulo)[0:30] + '...'
+            else: Titulo = str(Titulo)
+            if len(Medio) > 30:
+                Medio = str(Medio)[0:30] + '...'
+            else: Medio = str(Medio)
+            if len(Dimensiones) > 35:
+                Dimensiones = str(Dimensiones)[0:35] + '...'
+            else: Dimensiones = str(Dimensiones)
+            
             table.append([Titulo, Fecha, Medio, Dimensiones])
             pos1 += 1
         print(tabulate(table, headers='firstrow', tablefmt='fancy_grid'))
@@ -484,7 +495,7 @@ while True:
         
         try:
             start_time = time.process_time()
-            nacionalidad = input('Escriba la nacionaidad que desea consultar: ')
+            nacionalidad = input('Escriba la nacionalidad que desea consultar: ')
             print()
             print('=============== Req labMaps 6 Inputs ===============')
             print('Buscando el número de obras de nacionalidad '+ nacionalidad)
