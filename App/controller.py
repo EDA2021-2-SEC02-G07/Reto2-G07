@@ -58,7 +58,7 @@ def loadData(catalog):
     fillMostUsedMediums(catalog)
     stop_time = time.process_time()
     elapsed_time_mseg = (stop_time - start_time)
-    print('La carga del índice por medio demoró', elapsed_time_mseg, 'segundos')
+ 
     loadDptments(catalog)
     catalog['artists'] = sortArtists(catalog, 3)
     catalog['artists_tags'] = sortArtistTags(catalog, 3)
@@ -292,7 +292,7 @@ def Artworks_in_a_medium(name, catalog):
     medium = Artist_medium['mediums']['most_used']
     total = Artist_medium['mediums']['total']
     pos1, pos2 = model.Artworks_in_a_medium(medium, Artist_medium)
-    size = model.size(Artist_medium['Artworks']) + 1
+    size = model.size(Artist_medium['Artworks']) 
 
     return ID, medium, total, pos1, pos2, size
 

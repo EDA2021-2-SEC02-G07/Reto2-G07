@@ -311,8 +311,12 @@ def Artist_in_a_range(year1, year2, catalog):
 
 
 def Artworks_in_a_medium(medium, artworks):
-    pos1, pos2 = binary_interval_search(artworks, 'Artworks', medium, medium, cmpArtworksByMedium, cmpArtworksByMediumItem)
+    try:
+        pos1, pos2 = binary_interval_search(artworks, 'Artworks', medium, medium, cmpArtworksByMedium, cmpArtworksByMediumItem)
+    except: 
+        pos1, pos2 = None, None
     return pos1, pos2
+
 
 
 def TagsFromName(name, catalog): 
