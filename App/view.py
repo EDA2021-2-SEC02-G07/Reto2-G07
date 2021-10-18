@@ -83,6 +83,17 @@ def printSortResults(ord_artworks, sample=3):
     if size > sample:
         print("Las primeras y últimas ", sample, " obras ordenados son:")
         print()
+
+def trydepartment():
+    Department = input('Ingrese el nombre del departamento: ')
+    try:
+        return controller.Department_transport(catalog, Department)
+    except:
+        print('Por favor ingrese un departamento valido')
+        return trydepartment()
+
+
+    
         
     
     table = [['Title ', 'ArtistNames', 'Medium', 'Date', 'Dimensions']]
@@ -396,9 +407,7 @@ while True:
         print(n)
     elif int(inputs[0]) == 5: 
         start_time = time.process_time()
-        Department = input('Ingrese el nombre del departamento: ')
-
-        price, weight, size, Oldest, Oldest_prices, expensives, expensive_prices = controller.Department_transport(catalog, Department)
+        price, weight, size, Oldest, Oldest_prices, expensives, expensive_prices = trydepartment()
 
         if weight == 0:
             weight = 'no registra'
