@@ -341,40 +341,42 @@ while True:
         name = input('Ingrese el nombre del artista: ')
 
 
-        ID, medium, total, pos1, pos2, size = controller.Artworks_in_a_medium(name, catalog)
+        ID, medium, total, pos1, pos2, size, name_1 = controller.Artworks_in_a_medium(name, catalog)
 
-        
-        print('La cantidad de obras del artista es: ', size)
-        print('El medio más empleado es: ', medium) 
-        print('En número de técnicas utilizadas es: ', total)
-        print('Las obras en las que se utilizó', medium, 'son: ')
-        try:
-            table = [['Título', 'Fecha', 'Medio', 'Dimensiones']]
-            while pos1 <= pos2:
-                obra = lt.getElement(controller.me.getValue(controller.mp.get(catalog['artists_mediums'], ID))['Artworks'], pos1)
-                Titulo = obra['Title']
-                Fecha = obra['Date']
-                Medio = obra['Medium']
-                Dimensiones = obra['Dimensions']
+        if name == name_1:
+            print('La cantidad de obras de', name_1, 'es: ', size)
+            print('El medio más empleado es: ', medium) 
+            print('En número de técnicas utilizadas es: ', total)
+            print('Las obras en las que se utilizó', medium, 'son: ')
+            try:
+                table = [['Título', 'Fecha', 'Medio', 'Dimensiones']]
+                while pos1 <= pos2:
+                    obra = lt.getElement(controller.me.getValue(controller.mp.get(catalog['artists_mediums'], ID))['Artworks'], pos1)
+                    Titulo = obra['Title']
+                    Fecha = obra['Date']
+                    Medio = obra['Medium']
+                    Dimensiones = obra['Dimensions']
 
-                if len(Titulo) > 30:
-                    Titulo = str(Titulo)[0:30] + '...'
-                else: Titulo = str(Titulo)
-                if len(Medio) > 30:
-                    Medio = str(Medio)[0:30] + '...'
-                else: Medio = str(Medio)
-                if len(Dimensiones) > 35:
-                    Dimensiones = str(Dimensiones)[0:35] + '...'
-                else: Dimensiones = str(Dimensiones)
+                    if len(Titulo) > 30:
+                        Titulo = str(Titulo)[0:30] + '...'
+                    else: Titulo = str(Titulo)
+                    if len(Medio) > 30:
+                        Medio = str(Medio)[0:30] + '...'
+                    else: Medio = str(Medio)
+                    if len(Dimensiones) > 35:
+                        Dimensiones = str(Dimensiones)[0:35] + '...'
+                    else: Dimensiones = str(Dimensiones)
 
-                table.append([Titulo, Fecha, Medio, Dimensiones])
-                pos1 += 1
-        except:
-            table=[['No hay obras registradas para el artista']]
-        print(tabulate(table, headers='firstrow', tablefmt='fancy_grid'))
-        stop_time = time.process_time()
-        elapsed_time_mseg = (stop_time - start_time)*1000
-        print('La carga demoró', elapsed_time_mseg, 'milisegundos')
+                    table.append([Titulo, Fecha, Medio, Dimensiones])
+                    pos1 += 1
+            except:
+                table=[['No hay obras registradas para el artista']]
+            print(tabulate(table, headers='firstrow', tablefmt='fancy_grid'))
+            stop_time = time.process_time()
+            elapsed_time_mseg = (stop_time - start_time)*1000
+            print('La carga demoró', elapsed_time_mseg, 'milisegundos')
+        else:
+            print('El nombre ingresado no registra')
 
     elif int(inputs[0]) == 4:
         start_time = time.process_time()
