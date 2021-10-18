@@ -67,7 +67,7 @@ def newCatalog():
     catalog['artists'] = lt.newList('ARRAY_LIST')
     catalog['artists_mediums'] = mp.newMap(1000, maptype = 'Probing', loadfactor = 0.5, comparefunction = cmpValueWithEntry)
     catalog['artists_tags'] = lt.newList('ARRAY_LIST')
-    catalog['artworks_dptments'] = {}
+    catalog['artworks_dptments'] = mp.newMap(1000, maptype= 'Probing', loadfactor = 0.5, comparefunction = cmpValueWithEntry)
     
     catalog['mediums_map'] = mp.newMap(100, maptype = 'Probing', loadfactor = 0.5, comparefunction = cmpValueWithEntry)
 
@@ -122,12 +122,7 @@ def add2DArtworks(catalog, artwork):
     lt.addLast(catalog['2DArtworks'], artwork)
 
 def addArtworkdptment(catalog, dptment, dptment_name):
-
-    catalog['artworks_dptments'][dptment_name] = dptment
-
-
-
-
+    mp.put(catalog['artworks_dptments'], dptment_name, dptment)
 
 
 def addArtistMedium(catalog, artist_medium):
@@ -155,6 +150,7 @@ def newDptment():
               'price':0,
               'weight':0,
               'expensive_artworks':{},
+              'oldest_artworks':{},
               'Artworks': lt.newList('ARRAY_LIST')
               }
     return dpment

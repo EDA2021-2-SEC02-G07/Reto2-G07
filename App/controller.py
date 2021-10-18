@@ -52,12 +52,11 @@ def loadData(catalog):
     loadAdquires(catalog)
     loadNacionalities(catalog)
     load2DArtworks(catalog)
-    start_time = time.process_time()
+
     loadArtistMediumsTags(catalog)
     fillArtistMediums(catalog)
     fillMostUsedMediums(catalog)
-    stop_time = time.process_time()
-    elapsed_time_mseg = (stop_time - start_time)
+
  
     loadDptments(catalog)
     catalog['artists'] = sortArtists(catalog, 3)
@@ -145,23 +144,23 @@ def loadDptments(catalog):
     for i in range(0, size + 1):
         artwork = model.getElement1(artworks, i)
         dptment = artwork['Department']
-
-        if dptment in catalog['artworks_dptments']:
+        
+        if lt.isPresent(mp.keySet(catalog['artworks_dptments']), dptment) != 0:
             pass
 
         else: 
             new_dptment = model.newDptment()
             model.addArtworkdptment(catalog, new_dptment, dptment)
 
-        model.addtolist(catalog['artworks_dptments'][dptment]['Artworks'], artwork)
+        model.addtolist(me.getValue(mp.get(catalog['artworks_dptments'], dptment))['Artworks'], artwork)
         try:
             weight = float(artwork['Weight (kg)'])
-            catalog['artworks_dptments'][dptment]['weight'] += weight
+            me.getValue(mp.get(catalog['artworks_dptments'], dptment))['weight'] += weight
         except: 
             pass
 
-        catalog['artworks_dptments'][dptment]['price'] += model.Transport_Price(artwork)
-        model.expensive_artworks(artwork ,catalog['artworks_dptments'][dptment])
+        me.getValue(mp.get(catalog['artworks_dptments'], dptment))['price'] += model.Transport_Price(artwork)
+        model.expensive_artworks(artwork , me.getValue(mp.get(catalog['artworks_dptments'], dptment)))
 
 def loadArtistMediumsTags(catalog):
     artists = catalog['artists']
@@ -299,16 +298,16 @@ def Artworks_in_a_medium(name, catalog):
 
 
 def Department_transport(catalog, Department):
-    Artworks = catalog['artworks_dptments'][Department]['Artworks']
-    price = catalog['artworks_dptments'][Department]['price']
-    weight = catalog['artworks_dptments'][Department]['weight']
+    Artworks = me.getValue(mp.get(catalog['artworks_dptments'], Department))['Artworks']
+    price = me.getValue(mp.get(catalog['artworks_dptments'], Department))['price']
+    weight = me.getValue(mp.get(catalog['artworks_dptments'], Department))['weight']
     size = model.size(Artworks)
-    expensive = catalog['artworks_dptments'][Department]['expensive_artworks']
+    expensive = me.getValue(mp.get(catalog['artworks_dptments'], Department))['expensive_artworks']
     Oldest = []
     expensives = []
     expensive_prices = []
     for i in range(0,5):
-        Oldest.append(model.lt.getElement(catalog['artworks_dptments'][Department]['Artworks'], i))
+        Oldest.append(model.lt.getElement(me.getValue(mp.get(catalog['artworks_dptments'], Department))['Artworks'], i))
     Oldest_prices = []
 
     for artwork in Oldest:
@@ -353,7 +352,10 @@ def sortArtistTags(catalog, sort):
 
 def sort_dptments(catalog):
     artworks_dptments = catalog['artworks_dptments']
-
-    for key in artworks_dptments:
-        dptment = artworks_dptments[key]
+    keys = mp.keySet(artworks_dptments)
+    size = lt.size(keys)
+    for i in range(0, size+1):
+        key = lt.getElement(keys, i)
+        dptment = me.getValue(mp.get(artworks_dptments, key))
         dptment['Artworks'] = sortArtworksByYear(dptment, 3)
+

@@ -407,47 +407,53 @@ while True:
         print('El peso total de las obras es de: ', weight)
         print('El número de obras a transportar es de:', size)
         print('Las obras más antiguas a transportar son: ')
-        table = [['Título', 'Clasificación', 'Fecha', 'Medio', 'Dimensiones', 'Costo']]
+        table = [['Título', 'Clasificación', 'Fecha', 'Medio', 'Dimensiones', 'Costo', 'Artistas']]
         n = 0
         for obra in Oldest:
-            if len(str(obra['Title'])) > 30:
-                title = str(obra['Title'])[0:30] + '...'
+            if len(str(obra['Title'])) > 20:
+                title = str(obra['Title'])[0:20] + '...'
             else: title = str(obra['Title'])
-            if len(controller.giveAuthorsName(catalog, eval(obra['ConstituentID']))) > 14:
-                artists = controller.giveAuthorsName(catalog, eval(obra['ConstituentID']))[0:30] + '...'
-            else: artists = controller.giveAuthorsName(catalog, eval(obra['ConstituentID']))
-            if len(obra['Medium']) > 30:
-                medium = obra['Medium'][0:30] + '...'
+            try:
+                if len(controller.giveAuthorsName(catalog, eval(obra['ConstituentID']))) > 14:
+                    artists = controller.giveAuthorsName(catalog, eval(obra['ConstituentID']))[0:30] + '...'
+                else: artists = controller.giveAuthorsName(catalog, eval(obra['ConstituentID']))
+            except:
+                artists = 'no registra'
+            if len(obra['Medium']) > 20:
+                medium = obra['Medium'][0:20] + '...'
             else: medium = obra['Medium']
-            if len(obra['Dimensions']) > 35:
-                dimension = obra['Dimensions'][0:35] + '...'
+            if len(obra['Dimensions']) > 20:
+                dimension = obra['Dimensions'][0:20] + '...'
             else: dimension = obra['Dimensions']
             Clasificacion = obra['Classification']
             Fecha = obra['Date']
             Costo = (Oldest_prices[n])
-            table.append([title, Clasificacion, Fecha, medium, dimension, Costo])
+            table.append([title, Clasificacion, Fecha, medium, dimension, Costo, artists])
             n+=1
         print(tabulate(table, headers='firstrow', tablefmt='fancy_grid', stralign='left'))
-        table = [['Título', 'Clasificación', 'Fecha', 'Medio', 'Dimensiones', 'Costo']]
+        table = [['Título', 'Clasificación', 'Fecha', 'Medio', 'Dimensiones', 'Costo', 'Artistas']]
         print('Las obras más caras son: ')
         n = 0
         for obra in expensives:
-            if len(str(obra['Title'])) > 30:
-                title = str(obra['Title'])[0:30] + '...'
+            if len(str(obra['Title'])) > 20:
+                title = str(obra['Title'])[0:20] + '...'
             else: title = str(obra['Title'])
-            if len(controller.giveAuthorsName(catalog, eval(obra['ConstituentID']))) > 14:
-                artists = controller.giveAuthorsName(catalog, eval(obra['ConstituentID']))[0:30] + '...'
-            else: artists = controller.giveAuthorsName(catalog, eval(obra['ConstituentID']))
-            if len(obra['Medium']) > 30:
-                medium = obra['Medium'][0:30] + '...'
+            try:
+                if len(controller.giveAuthorsName(catalog, eval(obra['ConstituentID']))) > 14:
+                    artists = controller.giveAuthorsName(catalog, eval(obra['ConstituentID']))[0:30] + '...'
+                else: artists = controller.giveAuthorsName(catalog, eval(obra['ConstituentID']))
+            except:
+                artists = 'no registra'
+            if len(obra['Medium']) > 20:
+                medium = obra['Medium'][0:20] + '...'
             else: medium = obra['Medium']
-            if len(obra['Dimensions']) > 35:
-                dimension = obra['Dimensions'][0:35] + '...'
+            if len(obra['Dimensions']) > 20:
+                dimension = obra['Dimensions'][0:20] + '...'
             else: dimension = obra['Dimensions']
             Clasificacion = obra['Classification']
             Fecha = obra['Date']
             Costo = Oldest_prices[n]
-            table.append([title, Clasificacion, Fecha, medium, dimension, Costo])
+            table.append([title, Clasificacion, Fecha, medium, dimension, Costo, artists])
             n+=1
         print(tabulate(table, headers='firstrow', tablefmt='fancy_grid', stralign='left'))
         stop_time = time.process_time()
