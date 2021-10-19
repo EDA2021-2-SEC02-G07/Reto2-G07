@@ -51,7 +51,6 @@ def loadData(catalog):
     loadArtists(catalog)
     loadAdquires(catalog)
     loadNacionalities(catalog)
-    load2DArtworks(catalog)
 
     loadArtistMediumsTags(catalog)
     fillArtistMediums(catalog)
@@ -67,7 +66,7 @@ def loadArtworks(catalog):
     """
     Carga las obras del archivo.  
     """
-    artfile = cf.data_dir + 'Artworks-utf8-small.csv'
+    artfile = cf.data_dir + 'Artworks-utf8-large.csv'
     input_file = csv.DictReader(open(artfile, encoding='utf-8'))
     for artwork in input_file:
         model.addArtwork(catalog, artwork)
@@ -78,7 +77,7 @@ def loadArtists(catalog):
 
     Complejidad:  O(n + nlogn) n es el número de obras.
     """
-    artfile = cf.data_dir + 'Artists-utf8-small.csv'
+    artfile = cf.data_dir + 'Artists-utf8-large.csv'
     input_file = csv.DictReader(open(artfile, encoding='utf-8'))
     for artist in input_file:
         model.addArtist(catalog, artist) 
@@ -92,7 +91,7 @@ def loadAdquires(catalog):
         Complejidad:  O(nlogn) n es el número de obras.
     """
     catalog['adquire'] = lt.subList(catalog['artworks'], 1, lt.size(catalog['artworks']))
-    catalog['adquire'] = model.sortAdquires(catalog)
+    catalog['adquire'] = sortArtworksByAcquires(catalog['adquire'])
 
 def loadNacionalities(catalog):
     """
@@ -109,25 +108,30 @@ def loadNacionalities(catalog):
         for z in eval(y['ConstituentID']):
             pos = model.giveElementBinarySearch(artists['elements'],'ConstituentID',int(z))
             if pos != -1:
+                lt.addLast(me.getValue(mp.get(catalog['artworksByAnArtist'], str(z))), y) 
                 nationality = lt.getElement(artists, pos + 1)['Nationality']
                 if nationality != '' and nationality != 'Nationality unknown':
+                    nationNtMap = me.getValue(mp.get(nts, nationality))
+                    mp.put(nationNtMap, y['ObjectID'], y)
                     lt.addLast(me.getValue(mp.get(sizes, nationality)), y) 
-                    if lt.isPresent(me.getValue(mp.get(nts, nationality)), y) == 0: 
-                        lt.addLast(me.getValue(mp.get(nts, nationality)), y) 
                 else: 
                     lt.addLast(me.getValue(mp.get(sizes, 'Unknown')), y) 
-                    if lt.isPresent(me.getValue(mp.get(nts, 'Unknown')), y) == 0: 
-                        lt.addLast(me.getValue(mp.get(nts, 'Unknown')), y) 
-
+                    Unknowns = me.getValue(mp.get(nts, 'Unknown'))
+                    mp.put(Unknowns, y['ObjectID'], y)
+                    
     for x in lt.iterator(mp.keySet(nts)):
-        z = mp.get(nts, x)['value']
-        lt.addLast(catalog['bigNation'],z)
+        listnt = lt.newList('ARRAY_LIST')
+        nt = mp.get(nts, x)['value']
+        listnt['nation'] = nt['nation']
+        sz = mp.get(sizes, x)['value']
+        
+        keys = mp.keySet(nt)
+        for y in lt.iterator(keys):
+            lt.addLast(listnt,mp.get(nt,y))
+        lt.addLast(catalog['nations'],sz)
+        lt.addLast(catalog['bigNation'],listnt)
     catalog['bigNation'] = model.sortBigNation(catalog)
     catalog['bigNation'] = catalog['bigNation']['elements'][0]
-
-    for x in lt.iterator(mp.keySet(sizes)):
-        z = mp.get(sizes, x)['value']
-        lt.addLast(catalog['nations'],z)
     catalog['nations'] = model.sortNationsSize(catalog)
     
 def load2DArtworks(catalog):
@@ -324,13 +328,49 @@ def give_artworks_in_a_medium(catalog, medium):
     mediumList = model.sortYearsOfaList(mediumList)
     
     return mediumList
+
+def giveRangeOfArtists(catalog, begin, end):
+    """
+        Dados por parametro el catálogo, una fecha de inicio y una fecha final, devuelve una lista con todos las obras que hayan sido adquiridas n ese rango de fechas
+        
+        Debido a que llama a dos busquedas binarias y nada más sabemos que su complejidad se aproxima a:
+
+            Complejidad:  O(2logn) n es el número de obras.
+    """
+    positions = Artist_in_a_range(begin, end, catalog)[1]
+    posI = positions[0]
+    posF = positions[-1]
+    return catalog['artists']['elements'][posI-1:posF]
+
+def giveTopProlificArtist(artists, artworks, catalog):
+    top = lt.newList('ARRAY_LIST')
+    for x in artists:
+        arts = me.getValue(mp.get(artworks, x['ConstituentID']))
+        x['usedMediums'] = 0
+        x['mostUsedMedium'] = ''
+        x['numberArtworks'] = lt.size(arts)
+        mediums = {}
+        n = 0
+        for y in lt.iterator(arts):
+            if y['Medium'] not in mediums:
+                mediums[y['Medium']] = 0
+                mediums[y['Medium']] += 1
+            else: 
+                mediums[y['Medium']] += 1
+            if mediums[y['Medium']] > n:
+                n = mediums[y['Medium']] 
+                x['mostUsedMedium'] = y['Medium']
+        x['usedMediums'] = len(mediums)
+        lt.addLast(top, x)
+    model.sortArtistsByArtworks(top, catalog)
+    return top
 # Funciones de ordenamiento
 
-def sortAdquires(catalog):
+def sortArtworksByAcquires(list):
     """
     Ordena las adquisiciones
     """
-    return model.sortAdquires(catalog)
+    return model.sortArtworksByAcquires(list)
 
 def sortArtists(catalog, sort):
     """

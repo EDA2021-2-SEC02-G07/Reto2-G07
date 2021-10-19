@@ -73,7 +73,7 @@ def newCatalog():
 
     catalog['nationSize'] = mp.newMap(120, maptype = 'Probing', loadfactor = 0.5)
     catalog['nationalities'] = mp.newMap(120, maptype = 'Probing', loadfactor = 0.5)
-
+    catalog['artworksByAnArtist'] = mp.newMap(30440, maptype = 'Probing', loadfactor = 0.5) 
     
     return catalog
 
@@ -102,21 +102,24 @@ def addArtist(catalog, artist):
     # Se adiciona el artista a la lista de artistas
 
     nts = catalog['nationalities']
-    Unknown = lt.newList(datastructure='ARRAY_LIST', cmpfunction= None, key='ConstituentID')
+    Unknown = mp.newMap(4305, maptype = 'CHAINING', loadfactor = 15) 
     Unknown['nation'] = 'Unknown'
+    Unknown2 = lt.newList(datastructure='ARRAY_LIST')
+    Unknown2['nation'] = 'Unknown'
     mp.put(nts,'Unknown', Unknown)
     sizes = catalog['nationSize']
-    mp.put(sizes,'Unknown', Unknown)
+    mp.put(sizes,'Unknown', Unknown2)
     if str(artist['Nationality']) != '':
         if mp.get(nts,str(artist['Nationality'])) == None:
-            nation = lt.newList(datastructure='ARRAY_LIST', cmpfunction= None, key='ConstituentID')
-            nation1 = lt.newList(datastructure='ARRAY_LIST', cmpfunction= None, key='ConstituentID')
+            nation = lt.newList(datastructure='ARRAY_LIST')
+            nation1 = mp.newMap(4305, maptype = 'CHAINING', loadfactor = 15) 
             nation['nation'] =  str(artist['Nationality'])
             nation1['nation'] =  str(artist['Nationality'])
             mp.put(nts,str(artist['Nationality']),nation1)
             mp.put(sizes,str(artist['Nationality']),nation)
     
     lt.addLast(catalog['artists'], artist)
+    mp.put(catalog['artworksByAnArtist'], artist['ConstituentID'], lt.newList(datastructure='ARRAY_LIST', cmpfunction= None))
 
 def add2DArtworks(catalog, artwork):
     lt.addLast(catalog['2DArtworks'], artwork)
@@ -236,16 +239,29 @@ def giveRightDateBinarySearch(list, element):
         else: 
             break
     
-    
-    result = mid
-    while cmpArtworkByDateAcquired2(lt.getElement(list, mid)['DateAcquired'],lt.getElement(list, result)['DateAcquired']) == 0:
-        mid += 1
-    mid -= 1
-
-    if cmpArtworkByDateAcquired2(element, lt.getElement(list, mid)['DateAcquired'] ) == 1:
-        return mid - 1
-    else:
-         return mid
+    if mid == 0:
+        return mid
+    elif lt.getElement(list, mid+1)['DateAcquired'] != '':
+        result = mid
+        if cmpArtworkByDateAcquired2(lt.getElement(list, mid+1)['DateAcquired'], element ) == 0:
+            while cmpArtworkByDateAcquired2(lt.getElement(list, mid+1)['DateAcquired'],lt.getElement(list, result)['DateAcquired'] ) == 0:
+                if lt.getElement(list, mid+2)['DateAcquired'] != '':
+                    return mid
+                else:
+                    mid += 1
+            mid -= 1
+        
+        elif cmpArtworkByDateAcquired2(lt.getElement(list, mid+1)['DateAcquired'], element ) == 1:
+            while cmpArtworkByDateAcquired2(lt.getElement(list, mid+1)['DateAcquired'], element) == 1:
+                mid += 1
+            mid -=1
+        elif cmpArtworkByDateAcquired2(lt.getElement(list, mid+1)['DateAcquired'], element ) == -1:
+            while cmpArtworkByDateAcquired2(lt.getElement(list, mid+1)['DateAcquired'], element) == -1:
+                mid -= 1
+    elif lt.getElement(list, mid+1)['DateAcquired'] == '':
+        while lt.getElement(list, mid+1)['DateAcquired'] == '':
+            mid -= 1
+    return mid
 
 def giveLeftDateBinarySearch(list,element):
     """
@@ -266,27 +282,38 @@ def giveLeftDateBinarySearch(list,element):
     mid = 0
     while lo <= hi:
         mid = (hi + lo) // 2
-        if cmpArtworkByDateAcquired2(lt.getElement(list, mid)['DateAcquired'], element ) == 1:
+        if cmpArtworkByDateAcquired2(lt.getElement(list, mid+1)['DateAcquired'], element ) == 1:
             lo = mid + 1
-        elif cmpArtworkByDateAcquired2(lt.getElement(list, mid)['DateAcquired'], element ) == -1:
+        elif cmpArtworkByDateAcquired2(lt.getElement(list, mid+1)['DateAcquired'], element ) == -1:
             hi = mid - 1
         else: 
             break 
-    
-    if lt.getElement(list, mid)['DateAcquired'] == '':
-        mid -=1
-    result = mid
-    while cmpArtworkByDateAcquired2(lt.getElement(list, mid)['DateAcquired'],lt.getElement(list, result)['DateAcquired'] ) == 0:
-        if mid - 1 == -1 or mid + 1 == lt.size(list):
-            return mid
-        else:
-            mid -= 1
-    mid += 1
-    if cmpArtworkByDateAcquired2(element, lt.getElement(list, mid)['DateAcquired'] ) == -1:
-        return mid + 1
+
+    if mid == 0:
+        return mid
+    elif lt.getElement(list, mid+1)['DateAcquired'] != '':
+        result = mid
+        if cmpArtworkByDateAcquired2(lt.getElement(list, mid+1)['DateAcquired'], element ) == 0:
+            while cmpArtworkByDateAcquired2(lt.getElement(list, mid+1)['DateAcquired'],lt.getElement(list, result)['DateAcquired'] ) == 0:
+                if mid - 1 == -1 or mid + 1 == lt.size(list):
+                    return mid
+                else:
+                    mid -= 1
+            mid += 1
         
-    else:
-         return mid
+        elif cmpArtworkByDateAcquired2(lt.getElement(list, mid+1)['DateAcquired'], element ) == -1:
+            while cmpArtworkByDateAcquired2(lt.getElement(list, mid+1)['DateAcquired'], element) == -1:
+                mid -= 1
+            mid += 1
+        elif cmpArtworkByDateAcquired2(lt.getElement(list, mid+1)['DateAcquired'], element ) == 1:
+            while cmpArtworkByDateAcquired2(lt.getElement(list, mid+1)['DateAcquired'], element) == 1:
+                mid += 1
+    elif lt.getElement(list, mid+1)['DateAcquired'] == '':
+        while lt.getElement(list, mid+1)['DateAcquired'] == '':
+            mid -= 1
+    
+            
+    return mid
 
 # Funciones utilizadas para comparar elementos dentro de una lista
 
@@ -434,6 +461,18 @@ def cmpArtworkByDate(date, entry):
     else: 
         return -1
 
+def cmpArtistByArtworks(artist1, artist2):
+    if artist1['numberArtworks'] < artist2['numberArtworks']:
+        return False
+    elif artist1['numberArtworks'] > artist2['numberArtworks']:
+        return True
+    else:
+        if artist1['usedMediums'] < artist2['usedMediums']:
+            return False
+        elif artist1['usedMediums'] > artist2['usedMediums']:
+            return True
+        else: 
+            return False
 
 # Funciones de ordenamiento
 
@@ -443,10 +482,10 @@ def sortYearsOfaList(list):
     sorted_list = merge.sort(list, cmpArtworksByYear)
     return  sorted_list
 
-def sortAdquires(catalog):
+def sortArtworksByAcquires(list):
     # Organiza una lista de obras según su fecha de adquisición.
 
-    sorted_list = merge.sort(catalog['adquire'], cmpArtworkByDateAcquired)
+    sorted_list = merge.sort(list, cmpArtworkByDateAcquired)
     return  sorted_list
 
 def sortArtistID(catalog):
@@ -465,6 +504,12 @@ def sortBigNation(catalog):
     # Organiza una lista de listas según el tamaño se sus sublistas.
 
     sorted_list = merge.sort(catalog['bigNation'], cmpArtworkBySize)
+    return  sorted_list
+
+def sortArtistsByArtworks(list, catalog):
+    # Organiza una lista de obras según su fecha 'Date'.
+
+    sorted_list = merge.sort(list, cmpArtistByArtworks)
     return  sorted_list
 
 def cmpArtistByBeginDate(artist1, artist2):

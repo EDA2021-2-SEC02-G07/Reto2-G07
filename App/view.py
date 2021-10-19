@@ -83,6 +83,41 @@ def printSortResults(ord_artworks, sample=3):
     if size > sample:
         print("Las primeras y últimas ", sample, " obras ordenados son:")
         print()
+    table = [['Title ', 'ArtistNames', 'Medium', 'Date', 'Dimensions', 'DateAcquired']]
+    while i < sample and i <= size-1:
+        artwork = ord_artworks[i]
+        if len(str(artwork['Title'])) > 30:
+            title = str(artwork['Title'])[0:30] + '...'
+        else: title = str(artwork['Title'])
+        if len(controller.giveAuthorsName(catalog, eval(artwork['ConstituentID']))) > 14:
+            artists = controller.giveAuthorsName(catalog, eval(artwork['ConstituentID']))[0:30] + '...'
+        else: artists = controller.giveAuthorsName(catalog, eval(artwork['ConstituentID']))
+        if len(artwork['Medium']) > 30:
+            medium = artwork['Medium'][0:30] + '...'
+        else: medium = artwork['Medium']
+        if len(artwork['Dimensions']) > 35:
+            dimension = artwork['Dimensions'][0:35] + '...'
+        else: dimension = artwork['Dimensions']
+        table.append([ title,artists,medium,artwork['Date'],dimension, artwork['DateAcquired']])
+        i+=1
+    i = size - sample
+    while i >= size-sample and i< size:
+        artwork = ord_artworks[i]
+        if len(str(artwork['Title'])) > 30:
+            title = str(artwork['Title'])[0:30] + '...'
+        else: title = str(artwork['Title'])
+        if len(controller.giveAuthorsName(catalog, eval(artwork['ConstituentID']))) > 14:
+            artists = controller.giveAuthorsName(catalog, eval(artwork['ConstituentID']))[0:30] + '...'
+        else: artists = controller.giveAuthorsName(catalog, eval(artwork['ConstituentID']))
+        if len(artwork['Medium']) > 30:
+            medium = artwork['Medium'][0:30] + '...'
+        else: medium = artwork['Medium']
+        if len(artwork['Dimensions']) > 35:
+            dimension = artwork['Dimensions'][0:35] + '...'
+        else: dimension = artwork['Dimensions']
+        table.append([ title,artists,medium,artwork['Date'],dimension, artwork['DateAcquired']])
+        i+=1
+    print(tabulate(table, headers='firstrow', tablefmt='fancy_grid')) 
 
 def trydepartment():
     Department = input('Ingrese el nombre del departamento: ')
@@ -132,46 +167,44 @@ def trydepartment():
         i-=1
     print(tabulate(table, headers='firstrow', tablefmt='fancy_grid')) 
 
-def printSort2DArtworksByYear(catalog, begin, end, area, sample=5):
-    artworks = controller.loadRangeOfYears2DArtworks(catalog, begin, end)
-    j = len(artworks)
-    if j< sample:
-        sample = j  
-    n = 0
-    finalArea = 0
-    for x in artworks:
-        if (float(x['Height (cm)'])*float(x['Width (cm)']))/10000 + finalArea <= area:
-            finalArea += (float(x['Height (cm)'])*float(x['Width (cm)']))/10000
-            n += 1
-    print('El MoMA va a exhibir obras entre', begin, 'y', end)
-    print('Hay', len(artworks), 'posibles obras para exponer en un área disponible de:', area, 'm²')
-    print('La posible exhibición podría tener', n ,'elementos')
-    print('Se utilizaron', round(finalArea,3), 'm² de los', area, 'm² disponibles')
+def printReq6(catalog, begin, end, n):
+    artists = controller.giveRangeOfArtists(catalog, begin, end)
+    artworks = catalog['artworksByAnArtist']
+    print('Hay', len(artists), 'artistas entre', begin, 'y', end)
     print()
-    print("Las primeras y últimas", sample, " obras ordenadas en el rango de años dado son:")
-    print()
-    
-    i=0
-    table = [['Title ', 'ArtistNames', 'Medium', 'Date', 'Dimensions', 'Classification']]
-    while i < sample and i <= j-1:
-        artwork = artworks[i]
-        if len(str(artwork['Title'])) > 30:
-            title = str(artwork['Title'])[0:30] + '...'
-        else: title = str(artwork['Title'])
-        if len(controller.giveAuthorsName(catalog, eval(artwork['ConstituentID']))) > 14:
-            artists = controller.giveAuthorsName(catalog, eval(artwork['ConstituentID']))[0:30] + '...'
-        else: artists = controller.giveAuthorsName(catalog, eval(artwork['ConstituentID']))
-        if len(artwork['Medium']) > 30:
-            medium = artwork['Medium'][0:30] + '...'
-        else: medium = artwork['Medium']
-        if len(artwork['Dimensions']) > 35:
-            dimension = artwork['Dimensions'][0:35] + '...'
-        else: dimension = artwork['Dimensions']
-        table.append([ title,artists,medium,artwork['Date'],dimension,artwork['Classification']])
+    print('El TOP', n ,'artistas más prolíficos en este rango de años son:')
+    top = controller.giveTopProlificArtist(artists,artworks,catalog)
+    i=1
+    table = [['ConstituentID', 'DisplayName', 'BeginDate', 'Gender', 'Artworks', 'Used Mediums', 'Top Medium']]
+    if lt.size(top) < n:
+        n = lt.size(top)
+    while i <= n:
+        artwork = lt.getElement(top, i)
+        if len(str(artwork['DisplayName'])) > 30:
+            DisplayName = str(artwork['DisplayName'])[0:30] + '...'
+        else: DisplayName = str(artwork['DisplayName'])
+        if len(artwork['mostUsedMedium']) > 30:
+            mostUsedMedium = artwork['mostUsedMedium'][0:30] + '...'
+        else: mostUsedMedium = artwork['mostUsedMedium']
+        table.append([ artwork['ConstituentID'],DisplayName,artwork['BeginDate'],artwork['Gender'],artwork['numberArtworks'], artwork['usedMediums'],mostUsedMedium])
         i+=1
-    i = len(artworks) - 1
-    while i >= j-sample and i>= 0:
-        artwork = artworks[i]
+    print(tabulate(table, headers='firstrow', tablefmt='fancy_grid')) 
+    
+    topID = lt.getElement(top, 1)['ConstituentID']
+    top1Name = lt.getElement(top, 1)['DisplayName']
+    top1num = lt.getElement(top, 1)['numberArtworks']
+    top1 = me.getValue(mp.get(artworks, topID))
+    top1 = controller.sortArtworksByAcquires(top1)
+    table = [['Title ', 'Medium', 'Date', 'Dimensions' ,'DateAcquired', 'Department', 'Classification']]
+    print()
+    print(top1Name + ' con el MoMA ID', topID, 'tiene', top1num, 'piezas a su nombre.')
+    print('Las primeras 5 organizadas por fecha de adquisición son:')
+    i = 1
+    sample = 5
+    if lt.size(top1) < sample:
+        sample = lt.size(top1)
+    while i <= sample:
+        artwork = lt.getElement(top1, i)
         if len(str(artwork['Title'])) > 30:
             title = str(artwork['Title'])[0:30] + '...'
         else: title = str(artwork['Title'])
@@ -184,8 +217,8 @@ def printSort2DArtworksByYear(catalog, begin, end, area, sample=5):
         if len(artwork['Dimensions']) > 35:
             dimension = artwork['Dimensions'][0:35] + '...'
         else: dimension = artwork['Dimensions']
-        table.append([ title,artists,medium,artwork['Date'],dimension,artwork['Classification']])
-        i-=1
+        table.append([ title,medium,artwork['Date'],dimension, artwork['DateAcquired'], artwork['Department'], artwork['Classification']])
+        i+=1
     print(tabulate(table, headers='firstrow', tablefmt='fancy_grid')) 
 
 def printBigNation(bigNation, sample =3):
@@ -193,11 +226,10 @@ def printBigNation(bigNation, sample =3):
     print('El país con más obras es ' + bigNation['nation'] + ' con', j, 'obras ' )
     print("Las primeras y últimas", sample, " obras ordenadas de nacionalidad ", "'",bigNation['nation'],"'"," son:")
     print()
-    j = lt.size(bigNation)
     i=1
     table = [['Title ', 'ArtistNames', 'Medium', 'Date', 'Dimensions']]
     while i <= sample:
-        artwork = lt.getElement(bigNation,i)
+        artwork = lt.getElement(bigNation,i)['value']
         if len(str(artwork['Title'])) > 30:
             title = str(artwork['Title'])[0:30] + '...'
         else: title = str(artwork['Title'])
@@ -214,7 +246,7 @@ def printBigNation(bigNation, sample =3):
         i+=1
     i = lt.size(bigNation) - 1
     while i >= j-sample:
-        artwork = lt.getElement(bigNation,i)
+        artwork = lt.getElement(bigNation,i)['value']
         if len(str(artwork['Title'])) > 30:
             title = str(artwork['Title'])[0:30] + '...'
         else: title = str(artwork['Title'])
@@ -289,7 +321,6 @@ while True:
 
         print("Cargando información de los archivos ....")
         print('Obras cargadas: ' + str(lt.size(catalog['artworks'])))
-        print('Obras que son de dos dimensiones cargadas: ' + str(lt.size(catalog['2DArtworks'])))
         print('Artistas cargados: ' + str(lt.size(catalog['artists'])))
         stop_time = time.process_time()
         elapsed_time_mseg = (stop_time - start_time)
@@ -336,16 +367,19 @@ while True:
             endDate = str(FinalYear) + '-' + str(FinalMonth) + '-' + str(FinallDay)
             date_object1 = datetime.strptime(beginDate, '%Y-%m-%d').date()
             date_object2 = datetime.strptime(endDate, '%Y-%m-%d').date()
-        except ValueError:
+        
+            
+            print('=============== Req No.2 Inputs ===============')
+            print('Busca obras entre ', beginDate, ' y ', endDate)
+            print()
+            print('=============== Req No.2 Answer ===============')
+            printSortResults(controller.giveRangeOfDates(catalog, beginDate, endDate))
+            elapsed_time_mseg = (stop_time - start_time)*1000
+            print('La carga demoró', elapsed_time_mseg, 'milisegundos')
+            stop_time = time.process_time()
+        except:
             print('Por favor ingrese una fecha válida')
-        print('=============== Req No.2 Inputs ===============')
-        print('Busca obras entre ', beginDate, ' y ', endDate)
-        print()
-        print('=============== Req No.2 Answer ===============')
-        printSortResults(controller.giveRangeOfDates(catalog, beginDate, endDate))
-        elapsed_time_mseg = (stop_time - start_time)*1000
-        print('La carga demoró', elapsed_time_mseg, 'milisegundos')
-        stop_time = time.process_time()
+            print()
 
     elif int(inputs[0]) == 3:
         start_time = time.process_time()
@@ -401,10 +435,6 @@ while True:
         printBigNation(catalog['bigNation'])
         elapsed_time_mseg = (stop_time - start_time)*1000
         print('La carga demoró', elapsed_time_mseg, 'milisegundos')
-        n = 0
-        for x in catalog['nations']['elements']:
-            n += 1
-        print(n)
     elif int(inputs[0]) == 5: 
         start_time = time.process_time()
         price, weight, size, Oldest, Oldest_prices, expensives, expensive_prices = trydepartment()
@@ -470,19 +500,23 @@ while True:
         print('La carga demoró', elapsed_time_mseg, 'milisegundos')
 
     elif int(inputs[0]) == 6:
-        start_time = time.process_time()
-        InitialYear = int(input('Escriba el año inicial de las obras: '))
-        EndingYear = int(input('Escriba el año final de las obras: '))
-        area = float(input('Indique el área disponible en m² para los objetos planos(cuadros y fotos): '))
-        print()
-        print('=============== Req No.6 Inputs ===============')
-        print('Busca obras entre ', InitialYear, ' y ', EndingYear)
-        print('Con un área disponible de:', area, 'm²')
-        print()
-        print('=============== Req No.6 Answer ===============')
-        printSort2DArtworksByYear(catalog, InitialYear, EndingYear, area)
-        elapsed_time_mseg = (stop_time - start_time)*1000
-        print('La carga demoró', elapsed_time_mseg, 'milisegundos')
+        try:
+            start_time = time.process_time()
+            InitialYear = int(input('Escriba el año inicial de las obras: '))
+            EndingYear = int(input('Escriba el año final de las obras: '))
+            n = int(input('Indique el número de artistas a consultar: '))
+            print()
+            print('=============== Req No.6 Inputs ===============')
+            print('Buscando los', n, 'más prolíficos entre ', InitialYear, ' y ', EndingYear)
+            print()
+            print('=============== Req No.6 Answer ===============')
+            printReq6(catalog, InitialYear, EndingYear, n)
+            elapsed_time_mseg = (stop_time - start_time)*1000
+            print('La carga demoró', elapsed_time_mseg, 'milisegundos')
+        except:
+            print()
+            print('ERROR: Ingrese un número válido')
+            print()
     
     elif int(inputs[0]) == 7:
         
@@ -529,6 +563,11 @@ while True:
             print('ERROR: Ingrese una nacionalidad válida.')
             print()
 
+    elif int(inputs[0]) == 9:
+        n = -1
+        for x in catalog['adquire']['elements']:
+            n +=1
+            print(x['DateAcquired'], n)
 
     else:
         sys.exit(0)
