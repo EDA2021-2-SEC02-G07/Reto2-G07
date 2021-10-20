@@ -446,7 +446,7 @@ while True:
         print('El peso total de las obras es de: ', weight)
         print('El número de obras a transportar es de:', size)
         print('Las obras más antiguas a transportar son: ')
-        table = [['Título', 'Clasificación', 'Fecha', 'Medio', 'Dimensiones', 'Costo', 'Artistas']]
+        table = [['Título', 'Clasificación', 'Fecha', 'Medio', 'Dimensiones', 'Costo', 'Artistas', 'Department']]
         n = 0
         for obra in Oldest:
             if len(str(obra['Title'])) > 20:
@@ -467,7 +467,8 @@ while True:
             Clasificacion = obra['Classification']
             Fecha = obra['Date']
             Costo = (Oldest_prices[n])
-            table.append([title, Clasificacion, Fecha, medium, dimension, Costo, artists])
+            Department = obra['Department']
+            table.append([title, Clasificacion, Fecha, medium, dimension, Costo, artists, Department])
             n+=1
         print(tabulate(table, headers='firstrow', tablefmt='fancy_grid', stralign='left'))
         table = [['Título', 'Clasificación', 'Fecha', 'Medio', 'Dimensiones', 'Costo', 'Artistas']]
@@ -491,7 +492,7 @@ while True:
             else: dimension = obra['Dimensions']
             Clasificacion = obra['Classification']
             Fecha = obra['Date']
-            Costo = Oldest_prices[n]
+            Costo = expensive_prices[n]
             table.append([title, Clasificacion, Fecha, medium, dimension, Costo, artists])
             n+=1
         print(tabulate(table, headers='firstrow', tablefmt='fancy_grid', stralign='left'))
@@ -564,10 +565,10 @@ while True:
             print()
 
     elif int(inputs[0]) == 9:
-        n = -1
-        for x in catalog['adquire']['elements']:
+        n = 0
+        for x in me.getValue(mp.get(catalog['artworks_dptments'], Department))['Artworks']['elements']:
             n +=1
-            print(x['DateAcquired'], n)
+            print(x['Department'], n)
 
     else:
         sys.exit(0)

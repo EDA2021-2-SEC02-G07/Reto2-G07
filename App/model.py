@@ -707,7 +707,7 @@ def Transport_Price(Artwork):
     tarifa = 72
 
     try:
-        Price1 = (float(Heigt)/100 * float(Lenght)/100) * tarifa
+        Price1 = (float(Heigt)/100 * float(Width)/100) * tarifa
     except:
         Price1 = 0
     try:
@@ -733,8 +733,8 @@ def Transport_Price(Artwork):
     return expensive
 
 
-def expensive_artworks(Artwork, dptment):
-    price = Transport_Price(Artwork)
+def expensive_artworks(Artwork, dptment, price):
+    
     Expensive_list = dptment['expensive_artworks']
     if len(Expensive_list) < 5:
         Expensive_list[price] = Artwork

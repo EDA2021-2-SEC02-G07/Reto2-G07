@@ -51,12 +51,9 @@ def loadData(catalog):
     loadArtists(catalog)
     loadAdquires(catalog)
     loadNacionalities(catalog)
-
     loadArtistMediumsTags(catalog)
     fillArtistMediums(catalog)
     fillMostUsedMediums(catalog)
-
- 
     loadDptments(catalog)
     catalog['artists'] = sortArtists(catalog, 3)
     catalog['artists_tags'] = sortArtistTags(catalog, 3)
@@ -134,22 +131,14 @@ def loadNacionalities(catalog):
     catalog['bigNation'] = catalog['bigNation']['elements'][0]
     catalog['nations'] = model.sortNationsSize(catalog)
     
-def load2DArtworks(catalog):
-    """
-        Carga en el cátalogo el la llave '2DArtworks' una sublista de las obras que sean de dos dimensiones (cuadros y fotos) 
-    """
-    for x in lt.iterator(catalog['artworks']):
-        if x['Date'] != '' and x['Width (cm)'] != '' and x['Height (cm)'] != '' :
-            model.add2DArtworks(catalog, x)
-
 def loadDptments(catalog):
     artworks = catalog['artworks']
     size = model.size(artworks)
-    for i in range(0, size + 1):
+    for i in range(1, size + 1):
         artwork = model.getElement1(artworks, i)
         dptment = artwork['Department']
         
-        if lt.isPresent(mp.keySet(catalog['artworks_dptments']), dptment) != 0:
+        if mp.get(catalog['artworks_dptments'], dptment) != None:
             pass
 
         else: 
@@ -162,9 +151,9 @@ def loadDptments(catalog):
             me.getValue(mp.get(catalog['artworks_dptments'], dptment))['weight'] += weight
         except: 
             pass
-
-        me.getValue(mp.get(catalog['artworks_dptments'], dptment))['price'] += model.Transport_Price(artwork)
-        model.expensive_artworks(artwork , me.getValue(mp.get(catalog['artworks_dptments'], dptment)))
+        price = model.Transport_Price(artwork)
+        me.getValue(mp.get(catalog['artworks_dptments'], dptment))['price'] += price
+        model.expensive_artworks(artwork , me.getValue(mp.get(catalog['artworks_dptments'], dptment)),price)
 
 def loadArtistMediumsTags(catalog):
     artists = catalog['artists']
@@ -223,19 +212,6 @@ def fillMostUsedMediums(catalog):
 
 
 # Funciones de consulta sobre el catálogo
-
-def loadRangeOfYears2DArtworks(catalog, begin, end):
-    """
-        Devuelve una lista con las obras de 2 dimensiones en un determinado rango de años
-
-        Complejidad:  tilda(2m) n es el número de obras y m el número de obras de 2 dimensiones, en archivo large m es igual al 80% de n
-    """
-    Artworks = []
-    for x in lt.iterator(catalog['2DArtworks']):
-        if int(x['Date']) >= begin and int(x['Date']) <= end:
-            Artworks.append(x)
-
-    return Artworks
 
 def giveRightPosArtworkstByDateAcquired(catalog, date):
     """
@@ -310,13 +286,13 @@ def Department_transport(catalog, Department):
     Oldest = []
     expensives = []
     expensive_prices = []
-    for i in range(0,5):
+    for i in range(1,6):
         Oldest.append(model.lt.getElement(me.getValue(mp.get(catalog['artworks_dptments'], Department))['Artworks'], i))
     Oldest_prices = []
 
     for artwork in Oldest:
 
-        Oldest_prices.insert(0, model.Transport_Price(artwork))
+        Oldest_prices.append(model.Transport_Price(artwork))
     for key in expensive:
         expensives.append(expensive[key])
         expensive_prices.append(key)
