@@ -50,9 +50,7 @@ def printMenu():
     print("4- clasificar las obras por nacionalidad de sus creadores (Req. 4)")
     print("5- transportar obras de un departamento (Req. 5)")
     print("6- proponer una nueva exposición en el museo (Req. 6)")
-    print("7- las n obras más antiguas para un medio específico (Req labMaps)")
-    print("8- número de obras con una nacionalidad (Req lab 6)")
-    print("9- Salir")
+    print("7- Salir")
 
 def initCatalog():
     """
@@ -374,9 +372,10 @@ while True:
             print()
             print('=============== Req No.2 Answer ===============')
             printSortResults(controller.giveRangeOfDates(catalog, beginDate, endDate))
+            stop_time = time.process_time()
             elapsed_time_mseg = (stop_time - start_time)*1000
             print('La carga demoró', elapsed_time_mseg, 'milisegundos')
-            stop_time = time.process_time()
+            
         except:
             print('Por favor ingrese una fecha válida')
             print()
@@ -433,6 +432,7 @@ while True:
         printSortNations(catalog['nations'])
         print()
         printBigNation(catalog['bigNation'])
+        stop_time = time.process_time()
         elapsed_time_mseg = (stop_time - start_time)*1000
         print('La carga demoró', elapsed_time_mseg, 'milisegundos')
     elif int(inputs[0]) == 5: 
@@ -512,6 +512,7 @@ while True:
             print()
             print('=============== Req No.6 Answer ===============')
             printReq6(catalog, InitialYear, EndingYear, n)
+            stop_time = time.process_time()
             elapsed_time_mseg = (stop_time - start_time)*1000
             print('La carga demoró', elapsed_time_mseg, 'milisegundos')
         except:
@@ -519,57 +520,6 @@ while True:
             print('ERROR: Ingrese un número válido')
             print()
     
-    elif int(inputs[0]) == 7:
-        
-        try:
-            start_time = time.process_time()
-
-            n = int(input('Escriba el número de obras a consultar por medio: '))  
-            medio = input('Escriba el medio que desea consultar: ')
-            print()
-            print('=============== Req labMaps Inputs ===============')
-            print('Buscando', n, 'obras más antiguas para el medio '+ medio)
-            print()
-            print('=============== Req labMaps Answer ===============')
-            mediumList = controller.give_artworks_in_a_medium(catalog, medio)
-            printMediumList(medio, mediumList, n)
-
-            elapsed_time_mseg = (stop_time - start_time)*1000
-            print('La carga demoró', elapsed_time_mseg, 'milisegundos')
-        except TypeError:
-            print()
-            print('ERROR: Ingrese un medio válido')
-            print()
-        except ValueError:
-            print()
-            print('ERROR: Ingrese un número de obras válido')
-            print()
-
-    elif int(inputs[0]) == 8:
-        
-        try:
-            start_time = time.process_time()
-            nacionalidad = input('Escriba la nacionalidad que desea consultar: ')
-            print()
-            print('=============== Req labMaps 6 Inputs ===============')
-            print('Buscando el número de obras de nacionalidad '+ nacionalidad)
-            print()
-            print('=============== Req labMaps Answer ===============')
-            print('El número total de obras de la nacionalidad '+ nacionalidad + ' es', mp.size(me.getValue(mp.get(catalog['nationSize'], nacionalidad))))
-
-            elapsed_time_mseg = (stop_time - start_time)*1000
-            print('La carga demoró', elapsed_time_mseg, 'milisegundos')
-        except TypeError:
-            print()
-            print('ERROR: Ingrese una nacionalidad válida.')
-            print()
-
-    elif int(inputs[0]) == 9:
-        n = 0
-        for x in me.getValue(mp.get(catalog['artworks_dptments'], Department))['Artworks']['elements']:
-            n +=1
-            print(x['Department'], n)
-
     else:
         sys.exit(0)
 sys.exit(0)
